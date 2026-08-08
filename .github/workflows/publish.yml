@@ -20,7 +20,7 @@ jobs:
           toolchain: ${{ matrix.rust-version }}
 
       - name: Install cargo-hack
-        run: cargo install cargo-hack --locked
+        run: cargo install cargo-hack --version 0.6.39 --locked
 
       - name: Run tests
         run: |
