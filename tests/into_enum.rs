@@ -5,7 +5,7 @@ extern crate alloc;
 #[cfg(not(feature = "std"))]
 use alloc::string::{String, ToString};
 
-use inew::New;
+use newgen::New;
 
 #[test]
 fn enum_into() {

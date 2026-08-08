@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use inew::New;
+use newgen::New;
 
 #[test]
 fn enum_type_alias() {

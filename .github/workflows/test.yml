@@ -13,14 +13,17 @@ jobs:
       matrix:
         rust-version: ['1.80.0', 'stable']
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust-version }}
-      - name: Test
+
+      - name: Install cargo-hack
+        run: cargo install cargo-hack --locked
+
+      - name: Run tests
         run: |
-          rustc --version && cargo --version
-          cargo test
-          cargo test --no-default-features
+          cargo hack --feature-powerset test

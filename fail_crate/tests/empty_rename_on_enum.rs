@@ -1,4 +1,4 @@
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 #[new(rename = "")]

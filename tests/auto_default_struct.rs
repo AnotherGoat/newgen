@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 #[cfg(not(feature = "std"))]
 use core::marker::PhantomData;
 
-use inew::New;
+use newgen::New;
 
 #[test]
 fn struct_unit_auto_default() {

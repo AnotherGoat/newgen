@@ -1,4 +1,4 @@
-use inew::New;
+use newgen::New;
 use std::marker::PhantomData;
 
 #[derive(New)]

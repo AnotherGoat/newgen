@@ -4,7 +4,7 @@ mod nested {
     use crate::nested::nested2::{A, B, C, D};
 
     pub mod nested2 {
-        use inew::New;
+        use newgen::New;
 
         #[derive(New)]
         #[new(pub(in crate::nested))]

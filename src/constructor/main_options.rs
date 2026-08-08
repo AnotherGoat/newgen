@@ -61,7 +61,7 @@ impl From<Option<PubArgument>> for Visibility {
             None => {
                 #[cfg(feature = "public-default")]
                 {
-                    Visibility::Public;
+                    Visibility::Public
                 }
                 #[cfg(not(feature = "public-default"))]
                 {

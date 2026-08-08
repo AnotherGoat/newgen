@@ -5,7 +5,7 @@ extern crate alloc;
 #[cfg(not(feature = "std"))]
 use alloc::{vec, vec::{Vec}};
 
-use inew::New;
+use newgen::New;
 
 #[test]
 fn struct_into_iter() {

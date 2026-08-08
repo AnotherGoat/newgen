@@ -1,8 +1,10 @@
-# INew – a library for generating constructors
+# NewGen – a library for generating constructors
 
 In Rust, writing constructors is common but can be repetitive and boring.
-This library simplifies the process,
-making the process more declarative and enjoyable, while freeing up time for more interesting tasks.
+This library simplifies the process, making it more declarative and enjoyable, while freeing up time for more interesting tasks.
+
+This is an enhanced fork of [INew](https://github.com/a14e/inew), with more advanced features and more thorough testing.
+If you want to use a simpler version, check out that one instead.
 
 The purpose of this library is to cover the most basic and frequent use cases.
 If you want more complex generation, you
@@ -12,7 +14,7 @@ should probably take a look at [rust-derive-builder](https://docs.rs/derive_buil
 
 - [Adding the library to your project](#adding-the-library-to-your-project)
   - [Мinimum supported Rust version](#minimum-supported-rust-version)
-  - [Breaking changes](#breaking-changes)
+  - [Migrating from INew](#migrating-from-inew)
   - [Feature flags](#feature-flags)
     - [Standard library support](#standard-library-support)
     - [Default constructor visibility](#default-constructor-visibility)
@@ -47,7 +49,7 @@ should probably take a look at [rust-derive-builder](https://docs.rs/derive_buil
 - [Special thanks to](#special-thanks-to)
 - [License](#license)
 - [Contributing](#contributing)
-- [Comparison with derive-new](#comparison-with-derive-new)
+- [Comparison with other libraries](#comparison-with-other-libraries)
 - [Related projects](#related-projects)
   - [Rust libraries](#rust-libraries)
   - [Java libraries](#java-libraries)
@@ -59,20 +61,20 @@ Add the dependency to your `Cargo.toml`.
 
 ```toml
 [dependencies]
-inew = "0.4.0"
+newgen = "0.1.0"
 ```
 
 ### Minimum supported Rust version
 
 The library requires a minimum Rust version of `1.80.0`.
 
-### Breaking changes
+### Migrating from INew
 
-The `v0.4.0` release has breaking changes which may affect older projects:
+Projects using INew may be affected when switching to NewGen:
 
-- Before `v0.4.0`, the default constructor visibility was `pub`.
-This was changed to mimic default Rust visibility behavior.
-The old behavior can be restored, see [Default constructor visibility](#default-constructor-visibility).
+- In INew, the default constructor visibility was `pub`.
+  This was changed in NewGen to mimic default Rust visibility behavior (private by default).
+  INew's behavior can be restored, see [Default constructor visibility](#default-constructor-visibility) for details.
 
 ### Feature flags
 
@@ -83,7 +85,7 @@ You can disable it by disabling all the default features, which adds support for
 
 ```toml
 [dependencies]
-inew = { version = "0.4.0", default-features = false }
+newgen = { version = "0.1.0", default-features = false }
 ```
 
 ### Default constructor visibility
@@ -93,7 +95,7 @@ Enabling it will change the default visibility of constructors to `pub`.
 
 ```toml
 [dependencies]
-inew = { version = "0.4.0", features = ["public-default"] }
+newgen = { version = "0.1.0", features = ["public-default"] }
 ```
 
 ## Usage examples
@@ -132,7 +134,7 @@ Having to create such a big `impl` block for a common and predictable pattern is
 Instead, the `New` macro can be used to generate the constructor implementation and avoid having to write so much boilerplate:
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 struct MyStruct {
@@ -152,14 +154,14 @@ By default:
 
 - The parameter list matches the struct fields in declaration order.
 - All the derived struct constructors will have the `new` name.
-See [Custom constructor names](#custom-constructor-names) for renaming options.
+  See [Custom constructor names](#custom-constructor-names) for renaming options.
 
 #### Tuple structs
 
 Tuple structs are fully supported as well, and they work the same as normal structs.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 struct MyStruct(u32);
@@ -176,7 +178,7 @@ Parameter names are numbers prefixed by and underscore, like `_0`, `_1`, `_2`, a
 Unit-like structs also work as expected, and they generate a parameterless constructor:
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 struct MyStruct;
@@ -192,7 +194,7 @@ The macro can also derive constructors for enums.
 A constructor will be generated for each variant:
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 enum MyEnum {
@@ -211,7 +213,7 @@ fn main() {
 They work similarly to struct constructors, but enum constructor names have a few differences:
 
 - Each constructor is prefixed with `new_`.
-See [Custom constructor names](#custom-constructor-names) for renaming options.
+  See [Custom constructor names](#custom-constructor-names) for renaming options.
 - The variant name is added after the prefix, but converted to `snake_case`.
 
 Structs and enums have feature parity, so most of the examples below will use structs to keep them short.
@@ -224,7 +226,7 @@ For example, the following code will NOT generate a warning for Clippy's `too_ma
 ```rust
 #![warn(clippy::too_many_arguments)]
 
-use inew::New;
+use newgen::New;
 
 #[allow(clippy::too_many_arguments)]
 #[derive(New)]
@@ -245,7 +247,7 @@ struct MyStruct {
 The macro works fine most of the time when used with `use` and `type` aliases:
 
 ```rust
-use inew::New;
+use newgen::New;
 use std::string::String as S;
 
 type X = u32;
@@ -271,10 +273,10 @@ Fields can be omitted from the derived constructor by annotating them with the f
 
 - `#[new(default)]` initializes the field using `Default::default()`.
 - `#[new(default = <expression>)]` initializes the field using the provided expression.
-It can take any valid Rust expression as its argument, such as `1 + 1` or `vec![1]`.
+  It can take any valid Rust expression as its argument, such as `1 + 1` or `vec![1]`.
 
 ```rust
-use inew::New;
+use newgen::New;
 use std::collections::HashSet;
 
 macro_rules! custom_macro {
@@ -313,7 +315,7 @@ There are two special cases of fields that are automatically skipped from constr
 - `PhantomData<T>` fields, which are initialized as `PhantomData`.
 
 ```rust
-use inew::New;
+use newgen::New;
 use std::marker::PhantomData;
 
 #[derive(New)]
@@ -331,7 +333,7 @@ Due to procedural macro limitations, `use` aliases such as `use std::marker::Pha
 For these cases, you'll have to be explicit and use the `#[new(default)]` attribute instead.
 
 ```rust
-use inew::New;
+use newgen::New;
 use std::marker::PhantomData as PD;
 
 #[derive(New)]
@@ -351,7 +353,7 @@ Default fields can be annotated with `#[new(optional)]` to make them optional.
 This turns the parameter into `Option<T>` instead of `T`.
 
 ```rust
-use inew::New;
+use newgen::New;
 use std::collections::HashSet;
 
 macro_rules! custom_macro {
@@ -402,7 +404,7 @@ In other words, a field's `#[new(...)]` may use at most one of:
 Annotating a field with `#[new(into)]` changes the generated parameter type from `T` to `impl Into<T>`, and calls `.into()` internally.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 struct MyStruct {
@@ -422,7 +424,7 @@ The example above allows passing `&str`, `String`, or any other type that implem
 For collection fields, `#[new(into_iter)]` allows accepting any `IntoIterator<Item = T>` and collecting into the target collection type by calling `into_iter().collect()` internally.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 struct MyStruct {
@@ -450,7 +452,7 @@ In more complex cases (e.g., type aliases), item type inference may fail.
 For such cases, you can specify the iterator item type explicitly using `#[new(into_iter = <item_type>)]`:
 
 ```rust
-use inew::New;
+use newgen::New;
 
 type MyVector = Vec<u32>;
 
@@ -470,7 +472,7 @@ The derived constructor's name can be customized using the `#[new(rename = <cust
 For structs, `#[new(rename = <custom_name>)]` replaces the default `new` function name with `<custom_name>`.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 #[new(rename = "create")]
@@ -488,7 +490,7 @@ fn main() {
 For enums, using `#[new(rename = <custom_prefix>)]` replaces only the `new` prefix, not the full function name.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 #[new(rename = "create")]
@@ -511,7 +513,7 @@ If desired, the `no_prefix` option can be used to remove the prefix from generat
 Note that passing `#[new(rename = "")]` instead is not allowed.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 #[new(no_prefix)]
@@ -550,8 +552,8 @@ Visibility options allow specifying the constructor visibility with syntax simil
 The following forms are supported:
 
 | Attribute                    | Derived visibility                             |
-|------------------------------|------------------------------------------------|
-| *(nothing)*                  | Private or `pub` (depends on `public-default`) |
+| ---------------------------- | ---------------------------------------------- |
+| _(nothing)_                  | Private or `pub` (depends on `public-default`) |
 | `#[new(pub)]`                | `pub`                                          |
 | `#[new(pub = true)]`         | `pub`                                          |
 | `#[new(pub = false)]`        | Private                                        |
@@ -563,7 +565,7 @@ The following forms are supported:
 The following example showcases all the supported visibility options:
 
 ```rust
-use inew::New;
+use newgen::New;
 
 // Depends on the `public-default` feature
 #[derive(New)]
@@ -600,7 +602,7 @@ struct CrateVisible {
 }
 
 mod outer {
-    use inew::New;
+    use newgen::New;
 
     // super
     #[derive(New)]
@@ -617,7 +619,7 @@ mod outer {
     }
 
     pub mod inner {
-        use inew::New;
+        use newgen::New;
 
         // in <ancestor> (crate is always a valid example)
         #[derive(New)]
@@ -639,7 +641,7 @@ All type parameters, lifetime parameters, and bounds are copied to the derived `
 Generic type parameters are supported out of the box.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 struct MyStruct<Y, Z> {
@@ -656,7 +658,7 @@ fn main() {
 More complex cases with nested generics are also supported:
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 struct NestedStruct<Y, Z> {
@@ -679,7 +681,7 @@ fn main() {
 Generic bounds are also copied to the derived `impl` block.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 struct MyStruct<T: Clone> {
@@ -707,7 +709,7 @@ fn main() {
 Lifetime parameters are preserved and propagated to the constructor.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 struct MyStruct<'a> {
@@ -726,7 +728,7 @@ fn main() {
 Static references (`'static T`) require no special handling.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 const NAME: &str = "John";
 
@@ -745,7 +747,7 @@ fn main() {
 Fields using trait objects (dynamic dispatch) are fully supported, including borrowed `dyn` traits with lifetimes.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 struct MyStruct<'a> {
@@ -769,7 +771,7 @@ fn main() {
 Constructors can be generated as `const` functions using `#[new(const)]`, which allows usage in them in constant contexts.
 
 ```rust
-use inew::New;
+use newgen::New;
 
 #[derive(New)]
 #[new(const)]
@@ -787,7 +789,7 @@ Important limitations are:
 
 - `Default` is not yet stable as a `const` trait, so `#[new(default)]` is not supported.
 - Defaults of the form `#[new(default = expression)]` are supported as long as the expression is valid in a constant context.
-This is true for most macros without allocation and `const` functions.
+  This is true for most macros without allocation and `const` functions.
 - If the struct or enum has generics, default values are not supported for any case.
 - Since the `Into` and `ÌntoIter` traits are not `const` traits, the `#[new(into)]` and `#[new(into_iter)]` attributes are not supported.
 
@@ -807,24 +809,24 @@ A copy of the licenses is available in the [LICENSE-APACHE](LICENSE-APACHE) and 
 Any contribution is welcome.
 Just write tests and submit merge requests.
 
-## Comparison with derive-new
+## Comparison with other libraries
 
-There is a very similar library with similar features and sytax, [derive-new](https://docs.rs/derive_new/latest/derive_new/).
+There are very similar library with similar features and syntax, such as [derive-new](https://docs.rs/derive_new/latest/derive_new/) and [INew](https://github.com/a14e/inew), which this is a fork of.
 Below is a list of differences in the table:
 
-| Feature                         | INew | derive-new |
-|---------------------------------|------|------------|
-| Tuple structs support           | Yes  | Yes        |
-| Enum support                    | Yes  | Yes        |
-| Propagation of lint attributes  | Yes  | Yes        |
-| Default values for fields       | Yes  | Yes        |
-| Optional default values         | Yes  | No         |
-| Into parameters support         | Yes  | Yes        |
-| IntoIter parameters support     | Yes  | Yes        |
-| Constructor visibility settings | Yes  | Yes        |
-| Custom constructor names        | Yes  | No         |
-| Generics and lifetimes support  | Yes  | Yes        |
-| Constant constructor generation | Yes  | No         |
+| Feature                         | NewGen | INew | derive-new |
+| ------------------------------- | ------ | ---- | ---------- |
+| Tuple structs support           | Yes    | Yes  | Yes        |
+| Enum support                    | Yes    | No   | Yes        |
+| Propagation of lint attributes  | Yes    | No   | Yes        |
+| Default values for fields       | Yes    | Yes  | Yes        |
+| Optional default values         | Yes    | No   | No         |
+| Into parameters support         | Yes    | Yes  | Yes        |
+| IntoIter parameters support     | Yes    | No   | Yes        |
+| Constructor visibility settings | Yes    | Yes  | Yes        |
+| Custom constructor names        | Yes    | Yes  | No         |
+| Generics and lifetimes support  | Yes    | Yes  | Yes        |
+| Constant constructor generation | Yes    | Yes  | No         |
 
 ## Related projects
 

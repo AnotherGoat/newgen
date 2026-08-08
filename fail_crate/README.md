@@ -1,6 +1,6 @@
-# INew Test Fail Crate
+# NewGen Test Fail Crate
 
-This private crate only contains INew integration tests that are meant to fail.
+This private crate only contains NewGen integration tests that are meant to fail.
 These are run using the `trybuild` harness found in [../tests/fail_crate.rs](../tests/fail_crate.rs).
 
 It exists to keep the files that fail to compile separate, which must be ignored by the `cargo test` command from the root directory.
