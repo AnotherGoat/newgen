@@ -795,9 +795,7 @@ Important limitations are:
 
 ## Special thanks to
 
-- ChatGPT-4, which helped me write all the documentation for the first version and correct a huge number of errors in the code, during the early phases
-- Anna, who was my inspiration
-- Stable Diffusion, which helped me to create logo :-)
+- The creator of the original [INew](https://github.com/a14e/inew) library, and by proxy all their special thanks as well.
 
 ## License
 
@@ -807,7 +805,8 @@ A copy of the licenses is available in the [LICENSE-APACHE](LICENSE-APACHE) and 
 ## Contributing
 
 Any contribution is welcome.
-Just write tests and submit merge requests.
+Just make sure to write tests and submit pull requests.
+I suggest you submit an issue before so the change can be discussed and the chances of the PR being requested are lower.
 
 ## Comparison with other libraries
 
